@@ -45,7 +45,9 @@ struct PhotoCardView: View {
             .overlay(alignment: .bottom) {
                 if image != nil { caption }
             }
-            .task(id: LoadKey(assetID: asset.localIdentifier, token: reloadToken)) {
+            .task(id: PhotoLoadKey(assetID: asset.localIdentifier,
+                                   token: reloadToken,
+                                   width: Int(geo.size.width))) {
                 await load(pointSize: geo.size)
             }
         }
@@ -122,11 +124,6 @@ struct PhotoCardView: View {
 
     // MARK: - Loading
 
-    private struct LoadKey: Hashable {
-        let assetID: String
-        let token: Int
-    }
-
     private func load(pointSize: CGSize) async {
         guard pointSize.width > 0, pointSize.height > 0 else { return }
         loadError = nil
@@ -143,6 +140,14 @@ struct PhotoCardView: View {
             loadError = .underlying(error)
         }
     }
+}
+
+/// Identity of one image request; changing any field restarts the `.task`.
+/// Width is included so the first real layout pass (not a zero-size pass) triggers a load.
+private struct PhotoLoadKey: Hashable {
+    let assetID: String
+    let token: Int
+    let width: Int
 }
 
 private extension PhotoLibraryError {
