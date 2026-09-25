@@ -1,0 +1,90 @@
+/*
+  Localizable.strings (繁體中文 – 香港)
+  SiftRoll
+
+  Terminology follows Apple's Hong Kong iOS glossary:
+  相片 (photo), 相簿 (album), 相片圖庫 (photo library), 取用 (access),
+  私隱 (privacy), 設定 (Settings), 最近刪除 (Recently Deleted), 掃 (swipe).
+*/
+
+/* App */
+"app.name" = "SiftRoll";
+"app.slogan" = "篩揀時光，留存所惜。";
+"app.slogan.alt" = "Sift your moments, keep what matters.";
+
+/* Common */
+"common.cancel" = "取消";
+"common.ok" = "好";
+"common.done" = "完成";
+"common.retry" = "重試";
+"common.skip" = "略過";
+"common.notNow" = "暫時不要";
+"common.openSettings" = "前往設定";
+
+/* Permission screen */
+"permission.intro" = "SiftRoll 會將你的相片逐張以全螢幕卡片顯示。向右掃即保留，向左掃即刪除。相片不會被複製或上載，一直留在「相片」App 及 iCloud 之中。";
+"permission.feature.swipe" = "向右掃保留，向左掃刪除";
+"permission.feature.recentlyDeleted" = "已刪除的相片會存放於「最近刪除」30 日";
+"permission.feature.private" = "直接讀取相片圖庫，無需匯入";
+"permission.button.request" = "允許完整取用相片";
+"permission.button.settings" = "前往設定允許完整取用";
+"permission.status.limited" = "有限取用：SiftRoll 只能看到你所選的相片，暫時無法為你清理圖庫。";
+"permission.status.denied" = "SiftRoll 的相片取用權限已關閉。";
+"permission.status.restricted" = "此裝置已限制相片取用權限。";
+"permission.footnote" = "你可隨時於「設定 › 私隱與保安 › 相片」更改。";
+"permission.required.title" = "需要完整取用相片權限";
+"permission.required.message" = "SiftRoll 需要完整取用你的相片圖庫，才能瀏覽及刪除現有相片。「只限加入相片」或有限取用並不足夠。請前往「設定 › SiftRoll › 相片」並選擇「完整取用」。";
+
+/* Card deck */
+"deck.loading" = "正在載入相片圖庫⋯";
+"deck.loadingPhoto" = "正在載入相片⋯";
+"deck.progress" = "第 %1$@ 張，共 %2$@ 張";
+"deck.remaining" = "尚餘 %@ 張";
+"deck.hint" = "向右掃保留 · 向左掃刪除 · 兩指縮放";
+"deck.action.delete" = "刪除";
+"deck.action.keep" = "保留";
+"deck.finished.title" = "全部篩揀完成！";
+"deck.finished.message" = "你已檢視圖庫中的所有相片。日後相片積存起來，隨時回來再篩揀。";
+"deck.finished.kept" = "已保留";
+"deck.finished.deleted" = "已刪除";
+"deck.finished.restart" = "重新開始";
+"deck.empty.title" = "尚未有相片";
+"deck.empty.message" = "你的相片圖庫暫時是空的。拍攝一些相片後，再回來這裡篩揀吧。";
+
+/* Swipe overlay stamps */
+"swipe.keep" = "保留";
+"swipe.delete" = "刪除";
+
+/* Delete confirmation */
+"delete.confirm.title" = "要刪除此相片嗎？";
+"delete.confirm.message" = "相片會移至「相片」App 的「最近刪除」相簿，保留 30 日後才會永久刪除。";
+"delete.confirm.action" = "刪除";
+"delete.failed.title" = "無法刪除相片";
+"delete.failed.message" = "「相片」無法刪除此項目。它可能屬於共享相簿，或已被移除。\n\n%@";
+
+/* Photo loading errors */
+"load.failed.title" = "無法載入相片";
+"load.failed.message" = "暫時無法載入此相片。請再試一次，或先略過。";
+"load.failed.icloud" = "此相片儲存於 iCloud，尚未下載。請檢查網絡連線後再試。";
+
+/* Photo caption */
+"photo.favorite" = "喜好項目";
+
+/* Settings */
+"settings.title" = "設定";
+"settings.language.section" = "語言";
+"settings.language.footer" = "SiftRoll 首次啟動時會跟隨 iPhone 的系統語言。你可隨時在此或使用 EN / 繁中 按鈕切換。";
+"settings.howItWorks.section" = "使用方法";
+"settings.howItWorks.keep" = "向右掃保留相片";
+"settings.howItWorks.delete" = "向左掃刪除（會先請你確認）";
+"settings.howItWorks.zoom" = "兩指縮放，點兩下還原";
+"settings.privacy.section" = "私隱";
+"settings.privacy.message" = "你的相片絕不會離開你的裝置。在 SiftRoll 刪除相片，會如「相片」App 一樣移至「最近刪除」。";
+"settings.privacy.photoPermission" = "相片圖庫權限";
+"settings.about.section" = "關於 SiftRoll";
+"settings.about.description" = "SiftRoll 是一款 Tinder 式的相機膠卷清理工具。它只會按需讀取相片圖庫的預覽圖，不會匯入、複製或上載任何相片。";
+"settings.about.version" = "版本";
+
+/* Accessibility */
+"language.toggle.accessibility" = "切換語言";
+"settings.button.accessibility" = "設定";

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Required for App Store review: explains why SiftRoll asks for read/write photo access. -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SiftRoll needs full access to your photo library so you can browse your photos as swipe cards and move the ones you no longer want to Recently Deleted. Photos are never copied or uploaded.</string>
+	<!-- SiftRoll shows its own bilingual explanation for limited access instead of the system picker. -->
+	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
+	<true/>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>zh-HK</string>
+	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+</dict>
+</plist>

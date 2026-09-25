@@ -1,0 +1,86 @@
+/*
+  Localizable.strings (English)
+  SiftRoll
+*/
+
+/* App */
+"app.name" = "SiftRoll";
+"app.slogan" = "Sift your moments, keep what matters.";
+"app.slogan.alt" = "篩揀時光，留存所惜。";
+
+/* Common */
+"common.cancel" = "Cancel";
+"common.ok" = "OK";
+"common.done" = "Done";
+"common.retry" = "Retry";
+"common.skip" = "Skip";
+"common.notNow" = "Not Now";
+"common.openSettings" = "Open Settings";
+
+/* Permission screen */
+"permission.intro" = "SiftRoll shows your photos one by one as full-screen cards. Swipe right to keep, swipe left to delete. Nothing is copied or uploaded — your photos stay in the Photos app and iCloud.";
+"permission.feature.swipe" = "Swipe right to keep, left to delete";
+"permission.feature.recentlyDeleted" = "Deleted photos go to Recently Deleted for 30 days";
+"permission.feature.private" = "Works directly with your library, no import needed";
+"permission.button.request" = "Allow Full Photo Access";
+"permission.button.settings" = "Open Settings to Allow Full Access";
+"permission.status.limited" = "Limited access: SiftRoll can only see the photos you selected, so it can’t clean up your library yet.";
+"permission.status.denied" = "Photo access is turned off for SiftRoll.";
+"permission.status.restricted" = "Photo access is restricted on this device.";
+"permission.footnote" = "You can change this at any time in Settings › Privacy & Security › Photos.";
+"permission.required.title" = "Full Photo Access Required";
+"permission.required.message" = "SiftRoll needs full access to your photo library to browse and delete your existing photos. “Add Photos Only” or limited access isn’t enough. Please open Settings › SiftRoll › Photos and choose “Full Access”.";
+
+/* Card deck */
+"deck.loading" = "Loading your photo library…";
+"deck.loadingPhoto" = "Loading photo…";
+"deck.progress" = "%1$@ of %2$@";
+"deck.remaining" = "%@ left";
+"deck.hint" = "Swipe right to keep · Swipe left to delete · Pinch to zoom";
+"deck.action.delete" = "Delete";
+"deck.action.keep" = "Keep";
+"deck.finished.title" = "All sifted!";
+"deck.finished.message" = "You’ve reviewed every photo in your library. Come back any time new moments pile up.";
+"deck.finished.kept" = "Kept";
+"deck.finished.deleted" = "Deleted";
+"deck.finished.restart" = "Start Over";
+"deck.empty.title" = "No Photos Yet";
+"deck.empty.message" = "Your photo library is empty. Once you take some photos, come back to sift through them here.";
+
+/* Swipe overlay stamps */
+"swipe.keep" = "Keep";
+"swipe.delete" = "Delete";
+
+/* Delete confirmation */
+"delete.confirm.title" = "Delete This Photo?";
+"delete.confirm.message" = "The photo will be moved to Recently Deleted in the Photos app, where it stays for 30 days before being permanently removed.";
+"delete.confirm.action" = "Delete";
+"delete.failed.title" = "Couldn’t Delete Photo";
+"delete.failed.message" = "Photos couldn’t delete this item. It may belong to a shared album or have already been removed.\n\n%@";
+
+/* Photo loading errors */
+"load.failed.title" = "Couldn’t Load Photo";
+"load.failed.message" = "This photo couldn’t be loaded right now. Try again, or skip it for now.";
+"load.failed.icloud" = "This photo is in iCloud and hasn’t downloaded yet. Check your connection and try again.";
+
+/* Photo caption */
+"photo.favorite" = "Favorite";
+
+/* Settings */
+"settings.title" = "Settings";
+"settings.language.section" = "Language";
+"settings.language.footer" = "SiftRoll follows your iPhone language on first launch. Switch any time here or with the EN / 繁中 button.";
+"settings.howItWorks.section" = "How It Works";
+"settings.howItWorks.keep" = "Swipe right to keep a photo";
+"settings.howItWorks.delete" = "Swipe left to delete (you’ll be asked to confirm)";
+"settings.howItWorks.zoom" = "Pinch to zoom, double-tap to reset";
+"settings.privacy.section" = "Privacy";
+"settings.privacy.message" = "Your photos never leave your device. Deleting a photo in SiftRoll moves it to Recently Deleted, exactly like the Photos app.";
+"settings.privacy.photoPermission" = "Photo Library Permission";
+"settings.about.section" = "About SiftRoll";
+"settings.about.description" = "SiftRoll is a Tinder-style cleaner for your camera roll. It reads previews from your library on demand — nothing is imported, copied or uploaded.";
+"settings.about.version" = "Version";
+
+/* Accessibility */
+"language.toggle.accessibility" = "Switch language";
+"settings.button.accessibility" = "Settings";

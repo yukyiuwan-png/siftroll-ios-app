@@ -1,0 +1,4 @@
+/* Localized Info.plist values (繁體中文 – 香港) – shown in the system permission dialog and on the Home Screen. */
+
+"CFBundleDisplayName" = "SiftRoll";
+"NSPhotoLibraryUsageDescription" = "SiftRoll 需要完整取用你的相片圖庫，以便你以卡片方式瀏覽相片，並將不再需要的相片移至「最近刪除」。相片絕不會被複製或上載。";
