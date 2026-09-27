@@ -12,8 +12,12 @@ struct DeckFinishedView: View {
 
     let keptCount: Int
     let deletedCount: Int
+    /// Photos swiped left that still wait for the single batch commit.
+    let pendingCount: Int
     /// True when the library had no photos at all (as opposed to "you finished").
     let isLibraryEmpty: Bool
+    let isDeleting: Bool
+    let onCommit: () -> Void
     let onRestart: () -> Void
 
     var body: some View {
@@ -47,19 +51,55 @@ struct DeckFinishedView: View {
                 }
             }
 
+            if pendingCount > 0 {
+                Text(l10n.t("deck.finished.pending", formatted(pendingCount)))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+            }
+
             Spacer()
 
-            Button(action: onRestart) {
-                Label(l10n.t("deck.finished.restart"), systemImage: "arrow.counterclockwise")
-                    .fontWeight(.semibold)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(Color.brandPrimary, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .foregroundStyle(.white)
+            VStack(spacing: 12) {
+                if pendingCount > 0 {
+                    Button(action: onCommit) {
+                        HStack(spacing: 8) {
+                            if isDeleting {
+                                ProgressView().tint(.white)
+                            } else {
+                                Image(systemName: "trash.fill")
+                            }
+                            Text(l10n.t("deck.pending.commit", formatted(pendingCount)))
+                                .fontWeight(.semibold)
+                                .monospacedDigit()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Color.brandDanger, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .foregroundStyle(.white)
+                    }
+                    .disabled(isDeleting)
+                }
+
+                Button(action: onRestart) {
+                    Label(l10n.t("deck.finished.restart"), systemImage: "arrow.counterclockwise")
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(pendingCount > 0 ? Color.white.opacity(0.1) : Color.brandPrimary,
+                                    in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .foregroundStyle(.white)
+                }
+                .disabled(isDeleting)
             }
             .padding(.horizontal, 28)
             .padding(.bottom, 12)
         }
+    }
+
+    private func formatted(_ value: Int) -> String {
+        value.formatted(.number.locale(l10n.language.locale))
     }
 
     private func statChip(value: Int, labelKey: String, color: Color, icon: String) -> some View {
@@ -82,7 +122,8 @@ struct DeckFinishedView: View {
 }
 
 #Preview {
-    DeckFinishedView(keptCount: 42, deletedCount: 17, isLibraryEmpty: false) {}
+    DeckFinishedView(keptCount: 42, deletedCount: 17, pendingCount: 5,
+                     isLibraryEmpty: false, isDeleting: false, onCommit: {}) {}
         .environmentObject(LocalizationManager())
         .background(Color.black)
         .preferredColorScheme(.dark)

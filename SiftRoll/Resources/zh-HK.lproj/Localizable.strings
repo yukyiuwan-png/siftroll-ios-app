@@ -55,12 +55,17 @@
 "swipe.keep" = "保留";
 "swipe.delete" = "刪除";
 
-/* Delete confirmation */
-"delete.confirm.title" = "要刪除此相片嗎？";
-"delete.confirm.message" = "相片會移至「相片」App 的「最近刪除」相簿，保留 30 日後才會永久刪除。";
-"delete.confirm.action" = "刪除";
+/* Pending deletion queue */
+"deck.pending.commit" = "立即刪除 %@ 張";
+"deck.pending.undo" = "還原上一張";
+"deck.finished.pending" = "尚有 %@ 張相片在待刪除列表中。點一下「立即刪除」即可將它們移至「最近刪除」，iOS 只會請你確認一次。";
+
+/* One-time deletion notice (first left swipe of the session) */
+"delete.notice.title" = "刪除前請留意";
+"delete.notice.message" = "向左掃的相片會先加入待刪除列表並即時離開卡片堆。當你點一下「立即刪除」，它們會移至「相片」App 的「最近刪除」相簿，保留 30 日。iOS 只會請你確認整批一次。";
+"delete.notice.action" = "明白";
 "delete.failed.title" = "無法刪除相片";
-"delete.failed.message" = "「相片」無法刪除此項目。它可能屬於共享相簿，或已被移除。\n\n%@";
+"delete.failed.message" = "「相片」無法刪除這些項目。它們可能屬於共享相簿，或已被移除。\n\n%@";
 
 /* Photo loading errors */
 "load.failed.title" = "無法載入相片";
@@ -76,10 +81,10 @@
 "settings.language.footer" = "SiftRoll 首次啟動時會跟隨 iPhone 的系統語言。你可隨時在此或使用 EN / 繁中 按鈕切換。";
 "settings.howItWorks.section" = "使用方法";
 "settings.howItWorks.keep" = "向右掃保留相片";
-"settings.howItWorks.delete" = "向左掃刪除（會先請你確認）";
+"settings.howItWorks.delete" = "向左掃加入待刪除列表，再點一下「立即刪除」整批移除";
 "settings.howItWorks.zoom" = "兩指縮放，點兩下還原";
 "settings.privacy.section" = "私隱";
-"settings.privacy.message" = "你的相片絕不會離開你的裝置。在 SiftRoll 刪除相片，會如「相片」App 一樣移至「最近刪除」。";
+"settings.privacy.message" = "你的相片絕不會離開你的裝置。在 SiftRoll 刪除相片，會如「相片」App 一樣移至「最近刪除」，iOS 每批只會請你確認一次。";
 "settings.privacy.photoPermission" = "相片圖庫權限";
 "settings.about.section" = "關於 SiftRoll";
 "settings.about.description" = "SiftRoll 是一款 Tinder 式的相機膠卷清理工具。它只會按需讀取相片圖庫的預覽圖，不會匯入、複製或上載任何相片。";

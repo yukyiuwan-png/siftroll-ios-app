@@ -6,6 +6,17 @@
 //  and how external library changes (e.g. deleting in Apple Photos while SiftRoll
 //  is open) are reconciled.
 //
+//  Deletion model
+//  --------------
+//  PhotoKit shows its own "Allow SiftRoll to delete this photo?" sheet for *every*
+//  `performChanges` that deletes, and no app can suppress it. To avoid one system
+//  prompt per swipe, swiping left only *queues* the photo (it leaves the deck
+//  instantly) and the queue is committed with a single `deleteAssets` call, which
+//  triggers exactly one system sheet for the whole batch.
+//
+//  Our own bilingual "Recently Deleted / 30 days" notice is shown once per session,
+//  on the first left swipe, and never again for individual photos.
+//
 
 import Photos
 import Combine
@@ -30,30 +41,35 @@ final class PhotoDeckViewModel: ObservableObject {
         }
     }
 
+    private static let pendingStorageKey = "SiftRoll.pendingDeletionIdentifiers"
+
     @Published private(set) var assets: [PHAsset] = []
     @Published private(set) var currentIndex = 0
     @Published private(set) var phase: Phase = .loading
     @Published private(set) var keptCount = 0
+    /// Photos actually removed from the library (committed batches).
     @Published private(set) var deletedCount = 0
+    /// Photos swiped left but not yet committed. Order = swipe order.
+    @Published private(set) var pendingDeletions: [PHAsset] = []
     @Published private(set) var isDeleting = false
 
-    /// Bound to the delete confirmation alert.
-    @Published var isConfirmingDeletion = false
+    /// Bound to the one-time "Before you delete" notice.
+    @Published var isShowingDeletionNotice = false
+    /// True once the user has acknowledged the notice in this session.
+    @Published private(set) var hasAcknowledgedDeletionNotice = false
     @Published var activeAlert: DeckAlert?
 
     private(set) var hasLoaded = false
 
     private let library: PhotoLibraryService
+    private let userDefaults: UserDefaults
     private var fetchResult: PHFetchResult<PHAsset>?
     private var loadTask: Task<Void, Never>?
     private var cancellables = Set<AnyCancellable>()
 
-    /// Assets we deleted ourselves and are still animating off-screen. The change
-    /// observer must not remove them early or the card would vanish mid-flight.
-    private var deletionsInFlight = Set<String>()
-
-    init(library: PhotoLibraryService) {
+    init(library: PhotoLibraryService, userDefaults: UserDefaults = .standard) {
         self.library = library
+        self.userDefaults = userDefaults
         library.libraryDidChange
             .sink { [weak self] change in self?.apply(change) }
             .store(in: &cancellables)
@@ -65,6 +81,7 @@ final class PhotoDeckViewModel: ObservableObject {
     var nextAsset: PHAsset? { asset(at: currentIndex + 1) }
     var totalCount: Int { assets.count }
     var remainingCount: Int { max(0, assets.count - currentIndex) }
+    var pendingCount: Int { pendingDeletions.count }
     /// 1-based position for the "12 of 3,204" label.
     var displayPosition: Int { min(currentIndex + 1, max(assets.count, 1)) }
 
@@ -89,6 +106,10 @@ final class PhotoDeckViewModel: ObservableObject {
         let result = library.fetchAllPhotos()
         fetchResult = result
 
+        // Photos queued in a previous session are still in the library; restore the
+        // queue so they don't reappear as cards and can still be committed.
+        let storedPending = restorePendingQueue()
+
         loadTask?.cancel()
         loadTask = Task { [weak self] in
             let collected = await Task.detached(priority: .userInitiated) { () -> [PHAsset] in
@@ -99,13 +120,16 @@ final class PhotoDeckViewModel: ObservableObject {
             }.value
 
             guard let self, !Task.isCancelled else { return }
-            self.assets = collected
+            let pendingIDs = Set(storedPending.map(\.localIdentifier))
+            self.pendingDeletions = storedPending
+            self.assets = collected.filter { !pendingIDs.contains($0.localIdentifier) }
             self.currentIndex = 0
-            self.phase = collected.isEmpty ? .finished : .browsing
+            self.phase = self.assets.isEmpty ? .finished : .browsing
         }
     }
 
     /// Resets counters and reloads – used by "Start Over" on the finished screen.
+    /// The pending queue is kept: those photos are still waiting to be committed.
     func restart() {
         keptCount = 0
         deletedCount = 0
@@ -133,46 +157,83 @@ final class PhotoDeckViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Delete
+    // MARK: - Delete (queue)
 
-    func requestDeletion() {
+    /// Whether a left swipe must first show the one-time in-app notice.
+    var needsDeletionNotice: Bool { !hasAcknowledgedDeletionNotice }
+
+    func presentDeletionNotice() {
         guard currentAsset != nil, !isDeleting else { return }
-        isConfirmingDeletion = true
+        isShowingDeletionNotice = true
     }
 
-    /// Performs the deletion after the user confirmed. Returns `true` on success.
-    /// The asset stays in `assets` until `finalizeDeletion(of:)` so the view can
-    /// animate the card away first.
-    func confirmDeletion() async -> Bool {
-        guard let asset = currentAsset else { return false }
+    func acknowledgeDeletionNotice() {
+        hasAcknowledgedDeletionNotice = true
+        isShowingDeletionNotice = false
+    }
+
+    /// Moves the top card into the pending queue. No PhotoKit call happens here, so
+    /// the card can leave the screen immediately and the next one takes its place.
+    func queueCurrentForDeletion() {
+        guard let asset = currentAsset else { return }
+        pendingDeletions.append(asset)
+        persistPendingQueue()
+        removeAssets(withIdentifiers: [asset.localIdentifier])
+    }
+
+    /// Puts the most recently queued photo back on top of the deck.
+    func undoLastQueuedDeletion() {
+        guard let asset = pendingDeletions.popLast() else { return }
+        persistPendingQueue()
+        assets.insert(asset, at: min(currentIndex, assets.count))
+        if phase == .finished { phase = .browsing }
+    }
+
+    /// Deletes every queued photo in one PhotoKit transaction → one system sheet.
+    /// Returns `true` if the batch was removed. Declining the system sheet keeps the
+    /// queue intact so the user can commit later.
+    func commitPendingDeletions() async -> Bool {
+        guard !pendingDeletions.isEmpty, !isDeleting else { return false }
         isDeleting = true
         defer { isDeleting = false }
 
-        deletionsInFlight.insert(asset.localIdentifier)
+        let batch = pendingDeletions
         do {
-            try await library.delete(asset)
-            deletedCount += 1
+            try await library.delete(batch)
+            deletedCount += batch.count
+            // Drop only what we sent; anything queued meanwhile stays.
+            let sent = Set(batch.map(\.localIdentifier))
+            pendingDeletions.removeAll { sent.contains($0.localIdentifier) }
+            persistPendingQueue()
             return true
         } catch PhotoLibraryError.cancelled {
-            deletionsInFlight.remove(asset.localIdentifier)
             return false
         } catch {
-            deletionsInFlight.remove(asset.localIdentifier)
             let detail = (error as? PhotoLibraryError).flatMap(Self.detailMessage) ?? error.localizedDescription
             activeAlert = .deletionFailed(detail: detail)
             return false
         }
     }
 
-    /// Removes the deleted asset from the deck once its fly-away animation finished.
-    func finalizeDeletion(of asset: PHAsset) {
-        deletionsInFlight.remove(asset.localIdentifier)
-        removeAssets(withIdentifiers: [asset.localIdentifier])
-    }
-
     private static func detailMessage(_ error: PhotoLibraryError) -> String? {
         if case .underlying(let inner) = error { return inner.localizedDescription }
         return nil
+    }
+
+    // MARK: - Pending queue persistence
+
+    private func persistPendingQueue() {
+        userDefaults.set(pendingDeletions.map(\.localIdentifier), forKey: Self.pendingStorageKey)
+    }
+
+    private func restorePendingQueue() -> [PHAsset] {
+        guard let identifiers = userDefaults.stringArray(forKey: Self.pendingStorageKey),
+              !identifiers.isEmpty else { return [] }
+        // Preserve swipe order; identifiers whose asset no longer exists are dropped.
+        let fetched = library.fetchAssets(withIdentifiers: identifiers)
+        var byID: [String: PHAsset] = [:]
+        fetched.enumerateObjects { asset, _, _ in byID[asset.localIdentifier] = asset }
+        return identifiers.compactMap { byID[$0] }
     }
 
     // MARK: - Library change reconciliation
@@ -183,10 +244,14 @@ final class PhotoDeckViewModel: ObservableObject {
         self.fetchResult = details.fetchResultAfterChanges
         guard details.hasIncrementalChanges else { return }
 
-        // Photos removed outside SiftRoll (or by us, once the animation is done).
-        var removed = Set(details.removedObjects.map(\.localIdentifier))
-        removed.subtract(deletionsInFlight)
+        // Photos removed outside SiftRoll, or by our own committed batch.
+        let removed = Set(details.removedObjects.map(\.localIdentifier))
+        guard !removed.isEmpty else { return }
         removeAssets(withIdentifiers: removed)
+
+        let pendingBefore = pendingDeletions.count
+        pendingDeletions.removeAll { removed.contains($0.localIdentifier) }
+        if pendingDeletions.count != pendingBefore { persistPendingQueue() }
         // New photos are deliberately not injected mid-session; "Start Over" picks them up.
     }
 

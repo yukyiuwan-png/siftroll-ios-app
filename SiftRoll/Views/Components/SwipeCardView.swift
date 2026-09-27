@@ -8,7 +8,7 @@
 //  • Double-tap resets zoom.
 //
 //  The horizontal offset is owned by the parent (`PhotoDeckView`) so it can hold the
-//  card while the delete confirmation is up, spring it back, or fly it off-screen.
+//  card while the one-time deletion notice is up, spring it back, or fly it off-screen.
 //
 
 import SwiftUI

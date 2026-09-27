@@ -115,12 +115,20 @@ final class PhotoLibraryService: NSObject, ObservableObject {
 
     // MARK: - Deletion
 
-    /// Moves `asset` to "Recently Deleted". iOS always shows its own confirmation
-    /// sheet for this; dismissing it surfaces as `PhotoLibraryError.cancelled`.
-    func delete(_ asset: PHAsset) async throws {
+    /// Assets for the given local identifiers (used to restore the pending queue).
+    func fetchAssets(withIdentifiers identifiers: [String]) -> PHFetchResult<PHAsset> {
+        PHAsset.fetchAssets(withLocalIdentifiers: identifiers, options: nil)
+    }
+
+    /// Moves `assets` to "Recently Deleted" in a single transaction. iOS shows one
+    /// confirmation sheet per `performChanges` call regardless of how many assets it
+    /// contains, so batching here is what keeps the prompt count down. Dismissing the
+    /// sheet surfaces as `PhotoLibraryError.cancelled`.
+    func delete(_ assets: [PHAsset]) async throws {
+        guard !assets.isEmpty else { return }
         do {
             try await PHPhotoLibrary.shared().performChanges {
-                PHAssetChangeRequest.deleteAssets([asset] as NSArray)
+                PHAssetChangeRequest.deleteAssets(assets as NSArray)
             }
         } catch let error as PHPhotosError where error.code == .userCancelled {
             throw PhotoLibraryError.cancelled

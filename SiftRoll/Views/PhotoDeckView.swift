@@ -38,7 +38,10 @@ struct PhotoDeckView: View {
                 case .finished:
                     DeckFinishedView(keptCount: model.keptCount,
                                      deletedCount: model.deletedCount,
-                                     isLibraryEmpty: model.totalCount == 0,
+                                     pendingCount: model.pendingCount,
+                                     isLibraryEmpty: model.totalCount == 0 && model.pendingCount == 0,
+                                     isDeleting: model.isDeleting,
+                                     onCommit: { Task { await commitPendingDeletions() } },
                                      onRestart: { model.restart() })
                 case .browsing:
                     deck
@@ -66,23 +69,24 @@ struct PhotoDeckView: View {
             .sheet(isPresented: $showsSettings) {
                 SettingsView()
             }
-            // 1) App-level confirmation. iOS shows its own system sheet afterwards; both are
-            //    kept because accidental deletion is the one thing this app must never do.
-            .alert(l10n.t("delete.confirm.title"), isPresented: $model.isConfirmingDeletion) {
-                Button(l10n.t("delete.confirm.action"), role: .destructive) {
-                    Task { await performDeletion() }
+            // 1) One-time in-app notice, shown on the first left swipe of the session.
+            //    After it is acknowledged, left swipes queue photos without any prompt.
+            .alert(l10n.t("delete.notice.title"), isPresented: $model.isShowingDeletionNotice) {
+                Button(l10n.t("delete.notice.action")) {
+                    model.acknowledgeDeletionNotice()
+                    queueCurrentCard()
                 }
                 Button(l10n.t("common.cancel"), role: .cancel) {
                     springBack()
                 }
             } message: {
-                Text(l10n.bilingual("delete.confirm.message"))
+                Text(l10n.bilingual("delete.notice.message"))
             }
             // 2) Error feedback when PhotoKit refuses the deletion.
             .alert(l10n.t("delete.failed.title"),
                    isPresented: isShowingErrorAlert,
                    presenting: model.activeAlert) { _ in
-                Button(l10n.t("common.ok"), role: .cancel) { springBack() }
+                Button(l10n.t("common.ok"), role: .cancel) {}
             } message: { alert in
                 switch alert {
                 case .deletionFailed(let detail):
@@ -186,10 +190,61 @@ struct PhotoDeckView: View {
                 }
             }
 
-            Text(l10n.t("deck.hint"))
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
+            if model.pendingCount > 0 {
+                pendingBar
+            } else {
+                Text(l10n.t("deck.hint"))
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
         }
+        .animation(.snappy(duration: 0.25), value: model.pendingCount > 0)
+    }
+
+    /// Shows how many photos are queued and commits them all with one system sheet.
+    private var pendingBar: some View {
+        HStack(spacing: 10) {
+            Button {
+                Haptics.impact(.light)
+                withAnimation(.snappy(duration: 0.25)) { model.undoLastQueuedDeletion() }
+            } label: {
+                Image(systemName: "arrow.uturn.backward")
+                    .font(.system(size: 14, weight: .semibold))
+                    .frame(width: 36, height: 36)
+                    .background(Color.white.opacity(0.1), in: Circle())
+                    .foregroundStyle(.white.opacity(0.9))
+            }
+            .buttonStyle(.plain)
+            .disabled(model.isDeleting || isAnimatingOut)
+            .accessibilityLabel(l10n.t("deck.pending.undo"))
+
+            Button {
+                Task { await commitPendingDeletions() }
+            } label: {
+                HStack(spacing: 8) {
+                    if model.isDeleting {
+                        ProgressView().tint(.white)
+                    } else {
+                        Image(systemName: "trash.fill")
+                    }
+                    Text(l10n.t("deck.pending.commit", formatted(model.pendingCount)))
+                        .fontWeight(.semibold)
+                        .monospacedDigit()
+                }
+                .font(.subheadline)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 10)
+                .background(Color.brandDanger, in: Capsule())
+            }
+            .buttonStyle(.plain)
+            .disabled(model.isDeleting)
+        }
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+    }
+
+    private func formatted(_ value: Int) -> String {
+        value.formatted(.number.locale(l10n.language.locale))
     }
 
     private func roundButton(icon: String, color: Color, labelKey: String, action: @escaping () -> Void) -> some View {
@@ -216,8 +271,13 @@ struct PhotoDeckView: View {
                 model.keepCurrent()
             }
         case .left:
-            // Leave the card where the user released it (red overlay visible) and ask first.
-            model.requestDeletion()
+            if model.needsDeletionNotice {
+                // First delete of the session: hold the card (red overlay visible)
+                // while the one-time notice explains what happens.
+                model.presentDeletionNotice()
+            } else {
+                queueCurrentCard()
+            }
         }
     }
 
@@ -228,24 +288,28 @@ struct PhotoDeckView: View {
         case .right:
             handleSwipe(.right)
         case .left:
-            withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
-                cardOffset = CGSize(width: -Metrics.swipeThreshold, height: 0)
+            if model.needsDeletionNotice {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
+                    cardOffset = CGSize(width: -Metrics.swipeThreshold, height: 0)
+                }
             }
-            model.requestDeletion()
+            handleSwipe(.left)
         }
     }
 
-    private func performDeletion() async {
-        guard let asset = model.currentAsset else { return }
-        let deleted = await model.confirmDeletion()
-        if deleted {
-            Haptics.notify(.success)
-            flyAway(.left) {
-                model.finalizeDeletion(of: asset)
-            }
-        } else {
-            springBack()
+    /// Card leaves immediately; the photo waits in the pending queue. No PhotoKit
+    /// call and therefore no system sheet until the batch is committed.
+    private func queueCurrentCard() {
+        Haptics.impact(.rigid)
+        flyAway(.left) {
+            model.queueCurrentForDeletion()
         }
+    }
+
+    /// One `deleteAssets` call for the whole queue → a single system confirmation.
+    private func commitPendingDeletions() async {
+        let deleted = await model.commitPendingDeletions()
+        if deleted { Haptics.notify(.success) }
     }
 
     /// Slides the card off-screen, then applies `completion` and resets the offset

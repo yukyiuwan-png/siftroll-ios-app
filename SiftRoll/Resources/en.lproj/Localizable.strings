@@ -51,12 +51,17 @@
 "swipe.keep" = "Keep";
 "swipe.delete" = "Delete";
 
-/* Delete confirmation */
-"delete.confirm.title" = "Delete This Photo?";
-"delete.confirm.message" = "The photo will be moved to Recently Deleted in the Photos app, where it stays for 30 days before being permanently removed.";
-"delete.confirm.action" = "Delete";
-"delete.failed.title" = "Couldn’t Delete Photo";
-"delete.failed.message" = "Photos couldn’t delete this item. It may belong to a shared album or have already been removed.\n\n%@";
+/* Pending deletion queue */
+"deck.pending.commit" = "Delete %@ Now";
+"deck.pending.undo" = "Undo last delete";
+"deck.finished.pending" = "%@ photos are still queued. Tap Delete Now to move them to Recently Deleted — iOS will ask you to confirm once.";
+
+/* One-time deletion notice (first left swipe of the session) */
+"delete.notice.title" = "Before You Delete";
+"delete.notice.message" = "Photos you swipe left are queued and removed from the deck right away. When you tap “Delete Now”, they move to Recently Deleted in the Photos app, where they stay for 30 days. iOS will ask you to confirm the whole batch just once.";
+"delete.notice.action" = "Got It";
+"delete.failed.title" = "Couldn’t Delete Photos";
+"delete.failed.message" = "Photos couldn’t delete these items. They may belong to a shared album or have already been removed.\n\n%@";
 
 /* Photo loading errors */
 "load.failed.title" = "Couldn’t Load Photo";
@@ -72,10 +77,10 @@
 "settings.language.footer" = "SiftRoll follows your iPhone language on first launch. Switch any time here or with the EN / 繁中 button.";
 "settings.howItWorks.section" = "How It Works";
 "settings.howItWorks.keep" = "Swipe right to keep a photo";
-"settings.howItWorks.delete" = "Swipe left to delete (you’ll be asked to confirm)";
+"settings.howItWorks.delete" = "Swipe left to queue for deletion, then tap Delete Now to remove the batch";
 "settings.howItWorks.zoom" = "Pinch to zoom, double-tap to reset";
 "settings.privacy.section" = "Privacy";
-"settings.privacy.message" = "Your photos never leave your device. Deleting a photo in SiftRoll moves it to Recently Deleted, exactly like the Photos app.";
+"settings.privacy.message" = "Your photos never leave your device. Deleting in SiftRoll moves photos to Recently Deleted, exactly like the Photos app, and iOS confirms each batch once.";
 "settings.privacy.photoPermission" = "Photo Library Permission";
 "settings.about.section" = "About SiftRoll";
 "settings.about.description" = "SiftRoll is a Tinder-style cleaner for your camera roll. It reads previews from your library on demand — nothing is imported, copied or uploaded.";
