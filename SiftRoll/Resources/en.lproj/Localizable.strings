@@ -60,6 +60,7 @@
 "delete.notice.title" = "Before You Delete";
 "delete.notice.message" = "Photos you swipe left are queued and removed from the deck right away. When you tap “Delete Now”, they move to Recently Deleted in the Photos app, where they stay for 30 days. iOS will ask you to confirm the whole batch just once.";
 "delete.notice.action" = "Got It";
+"delete.notice.remember" = "Remember my setting";
 "delete.failed.title" = "Couldn’t Delete Photos";
 "delete.failed.message" = "Photos couldn’t delete these items. They may belong to a shared album or have already been removed.\n\n%@";
 
@@ -79,6 +80,9 @@
 "settings.howItWorks.keep" = "Swipe right to keep a photo";
 "settings.howItWorks.delete" = "Swipe left to queue for deletion, then tap Delete Now to remove the batch";
 "settings.howItWorks.zoom" = "Pinch to zoom, double-tap to reset";
+"settings.deletion.section" = "Deletion";
+"settings.deletion.showNotice" = "Show notice before first delete";
+"settings.deletion.footer" = "When on, SiftRoll explains once per session that swiped photos are queued and moved to Recently Deleted for 30 days. Ticking “Remember my setting” in that notice turns this off.";
 "settings.privacy.section" = "Privacy";
 "settings.privacy.message" = "Your photos never leave your device. Deleting in SiftRoll moves photos to Recently Deleted, exactly like the Photos app, and iOS confirms each batch once.";
 "settings.privacy.photoPermission" = "Photo Library Permission";

@@ -14,6 +14,7 @@ import Photos
 struct PhotoDeckView: View {
     @EnvironmentObject private var l10n: LocalizationManager
     @EnvironmentObject private var library: PhotoLibraryService
+    @EnvironmentObject private var deletionPreferences: DeletionPreferences
     @Environment(\.displayScale) private var displayScale
 
     @StateObject private var model: PhotoDeckViewModel
@@ -69,19 +70,28 @@ struct PhotoDeckView: View {
             .sheet(isPresented: $showsSettings) {
                 SettingsView()
             }
-            // 1) One-time in-app notice, shown on the first left swipe of the session.
-            //    After it is acknowledged, left swipes queue photos without any prompt.
-            .alert(l10n.t("delete.notice.title"), isPresented: $model.isShowingDeletionNotice) {
-                Button(l10n.t("delete.notice.action")) {
-                    model.acknowledgeDeletionNotice()
-                    queueCurrentCard()
+            // 1) One-time in-app notice, shown on the first left swipe of the session
+            //    (or never again if "Remember my setting" was ticked). Afterwards left
+            //    swipes queue photos without any prompt. Custom view rather than
+            //    `.alert` because the checkbox cannot live inside a system alert.
+            .overlay {
+                if model.isShowingDeletionNotice {
+                    DeletionNoticeView(
+                        onConfirm: { remember in
+                            deletionPreferences.acknowledge(remember: remember)
+                            model.dismissDeletionNotice()
+                            queueCurrentCard()
+                        },
+                        onCancel: {
+                            model.dismissDeletionNotice()
+                            springBack()
+                        }
+                    )
+                    .transition(.opacity.combined(with: .scale(scale: 1.05)))
+                    .zIndex(10)
                 }
-                Button(l10n.t("common.cancel"), role: .cancel) {
-                    springBack()
-                }
-            } message: {
-                Text(l10n.bilingual("delete.notice.message"))
             }
+            .animation(.spring(response: 0.3, dampingFraction: 0.85), value: model.isShowingDeletionNotice)
             // 2) Error feedback when PhotoKit refuses the deletion.
             .alert(l10n.t("delete.failed.title"),
                    isPresented: isShowingErrorAlert,
@@ -271,7 +281,7 @@ struct PhotoDeckView: View {
                 model.keepCurrent()
             }
         case .left:
-            if model.needsDeletionNotice {
+            if deletionPreferences.shouldShowNotice {
                 // First delete of the session: hold the card (red overlay visible)
                 // while the one-time notice explains what happens.
                 model.presentDeletionNotice()
@@ -288,7 +298,7 @@ struct PhotoDeckView: View {
         case .right:
             handleSwipe(.right)
         case .left:
-            if model.needsDeletionNotice {
+            if deletionPreferences.shouldShowNotice {
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
                     cardOffset = CGSize(width: -Metrics.swipeThreshold, height: 0)
                 }

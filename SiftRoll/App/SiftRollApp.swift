@@ -16,11 +16,15 @@ struct SiftRollApp: App {
     /// Thin wrapper around PHPhotoLibrary: authorization, fetching, image loading, deletion.
     @StateObject private var photoLibrary = PhotoLibraryService()
 
+    /// Whether the one-time deletion notice still needs to be shown (session + "remember").
+    @StateObject private var deletionPreferences = DeletionPreferences()
+
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environmentObject(localization)
                 .environmentObject(photoLibrary)
+                .environmentObject(deletionPreferences)
                 // Drives system formatting (dates, numbers) so it follows the in-app language,
                 // not only the device language.
                 .environment(\.locale, localization.language.locale)

@@ -12,9 +12,10 @@ through `PHPhotoLibrary` – nothing is imported, copied or uploaded.
   language is detected from the system on first launch and can be toggled from
   the `EN | 繁中` pill in the navigation bar or from Settings.
 - **Safe by design, fast in practice**: swiping left queues a photo instead of
-  deleting it on the spot. A bilingual notice explains this once per session; after
-  that, swipes are instant and the queue is committed with one tap, producing a
-  single iOS confirmation for the whole batch. Deleted photos land in the iOS
+  deleting it on the spot. A bilingual notice explains this once per session (or
+  never again if *Remember my setting / 記住我的設定* is ticked); after that, swipes
+  are instant and the queue is committed with one tap, producing a single iOS
+  confirmation for the whole batch. Deleted photos land in the iOS
   *Recently Deleted* album (30-day recovery), exactly like Apple Photos.
 
 ## Requirements
@@ -49,6 +50,7 @@ SiftRoll/
     LocalizationManager.swift  Runtime language switching, `t("key")` lookup, bilingual helper
   Services/
     PhotoLibraryService.swift  PHPhotoLibrary authorization, fetching, image loading, deletion
+    DeletionPreferences.swift  Once-per-session flag + persisted "Remember my setting"
   ViewModels/
     PhotoDeckViewModel.swift   Deck state, pending-deletion queue + batch commit, library-change reconciliation
   Views/
@@ -59,6 +61,7 @@ SiftRoll/
     Components/
       SwipeCardView.swift      Drag (spring back / fly away) + pinch-to-zoom + double-tap reset
       SwipeOverlayView.swift   Green "Keep / 保留" and red "Delete / 刪除" stamps
+      DeletionNoticeView.swift Custom alert-style notice with the remember checkbox
       PhotoCardView.swift      On-demand image loading with loading / error / retry states
       DeckFinishedView.swift   "All sifted" and empty-library states
       LanguageToggleButton.swift
@@ -77,7 +80,7 @@ Design/
 | Gesture / action | Result |
 | --- | --- |
 | Drag right past the threshold | Card flies off, photo is kept, next card appears |
-| Drag left past the threshold (first time in session) | Card holds with the red overlay, one-time bilingual notice appears; *Got It* queues the photo, *Cancel* springs it back |
+| Drag left past the threshold (first time in session) | Card holds with the red overlay, one-time bilingual notice appears with a *Remember my setting* checkbox; *Got It* queues the photo, *Cancel* springs it back. The remembered choice can be reset in Settings › Deletion |
 | Drag left past the threshold (afterwards) | Card flies off immediately, photo joins the pending queue (no prompt) |
 | ↶ button in the pending bar | Puts the last queued photo back on top of the deck |
 | *Delete N Now* (pending bar or finished screen) | One `deleteAssets` call → single iOS sheet → photos move to *Recently Deleted* |

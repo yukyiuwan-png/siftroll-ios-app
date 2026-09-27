@@ -64,6 +64,7 @@
 "delete.notice.title" = "刪除前請留意";
 "delete.notice.message" = "向左掃的相片會先加入待刪除列表並即時離開卡片堆。當你點一下「立即刪除」，它們會移至「相片」App 的「最近刪除」相簿，保留 30 日。iOS 只會請你確認整批一次。";
 "delete.notice.action" = "明白";
+"delete.notice.remember" = "記住我的設定";
 "delete.failed.title" = "無法刪除相片";
 "delete.failed.message" = "「相片」無法刪除這些項目。它們可能屬於共享相簿，或已被移除。\n\n%@";
 
@@ -83,6 +84,9 @@
 "settings.howItWorks.keep" = "向右掃保留相片";
 "settings.howItWorks.delete" = "向左掃加入待刪除列表，再點一下「立即刪除」整批移除";
 "settings.howItWorks.zoom" = "兩指縮放，點兩下還原";
+"settings.deletion.section" = "刪除";
+"settings.deletion.showNotice" = "首次刪除前顯示提示";
+"settings.deletion.footer" = "開啟後，SiftRoll 每次使用時只會提示一次：掃走的相片會加入待刪除列表，並移至「最近刪除」保留 30 日。在提示中剔選「記住我的設定」即會關閉此選項。";
 "settings.privacy.section" = "私隱";
 "settings.privacy.message" = "你的相片絕不會離開你的裝置。在 SiftRoll 刪除相片，會如「相片」App 一樣移至「最近刪除」，iOS 每批只會請你確認一次。";
 "settings.privacy.photoPermission" = "相片圖庫權限";

@@ -14,8 +14,9 @@
 //  instantly) and the queue is committed with a single `deleteAssets` call, which
 //  triggers exactly one system sheet for the whole batch.
 //
-//  Our own bilingual "Recently Deleted / 30 days" notice is shown once per session,
-//  on the first left swipe, and never again for individual photos.
+//  Our own bilingual "Recently Deleted / 30 days" notice is shown at most once per
+//  session, on the first left swipe, and never again for individual photos. Ticking
+//  "Remember my setting" (see `DeletionPreferences`) suppresses it across launches.
 //
 
 import Photos
@@ -53,10 +54,9 @@ final class PhotoDeckViewModel: ObservableObject {
     @Published private(set) var pendingDeletions: [PHAsset] = []
     @Published private(set) var isDeleting = false
 
-    /// Bound to the one-time "Before you delete" notice.
+    /// Bound to the one-time "Before you delete" notice. Whether it is *needed* is
+    /// decided by `DeletionPreferences` (session flag + "remember my setting").
     @Published var isShowingDeletionNotice = false
-    /// True once the user has acknowledged the notice in this session.
-    @Published private(set) var hasAcknowledgedDeletionNotice = false
     @Published var activeAlert: DeckAlert?
 
     private(set) var hasLoaded = false
@@ -159,16 +159,12 @@ final class PhotoDeckViewModel: ObservableObject {
 
     // MARK: - Delete (queue)
 
-    /// Whether a left swipe must first show the one-time in-app notice.
-    var needsDeletionNotice: Bool { !hasAcknowledgedDeletionNotice }
-
     func presentDeletionNotice() {
         guard currentAsset != nil, !isDeleting else { return }
         isShowingDeletionNotice = true
     }
 
-    func acknowledgeDeletionNotice() {
-        hasAcknowledgedDeletionNotice = true
+    func dismissDeletionNotice() {
         isShowingDeletionNotice = false
     }
 

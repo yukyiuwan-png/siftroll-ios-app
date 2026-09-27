@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject private var l10n: LocalizationManager
+    @EnvironmentObject private var deletionPreferences: DeletionPreferences
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
@@ -17,6 +18,7 @@ struct SettingsView: View {
             Form {
                 languageSection
                 howItWorksSection
+                deletionSection
                 privacySection
                 aboutSection
             }
@@ -66,6 +68,33 @@ struct SettingsView: View {
             gestureRow(icon: "arrow.left.circle.fill", color: .brandDanger, key: "settings.howItWorks.delete")
             gestureRow(icon: "arrow.up.left.and.arrow.down.right.circle.fill", color: .brandPrimary, key: "settings.howItWorks.zoom")
         }
+    }
+
+    /// Lets the user undo "Remember my setting" and see the deletion notice again.
+    private var deletionSection: some View {
+        Section {
+            Toggle(isOn: showsDeletionNotice) {
+                Label {
+                    Text(l10n.t("settings.deletion.showNotice"))
+                } icon: {
+                    Image(systemName: "exclamationmark.bubble.fill")
+                        .foregroundStyle(.brandDanger)
+                }
+            }
+            .tint(.brandPrimary)
+        } header: {
+            Text(l10n.t("settings.deletion.section"))
+        } footer: {
+            Text(l10n.t("settings.deletion.footer"))
+        }
+    }
+
+    /// Inverse of the stored "skip" flag so the toggle reads positively.
+    private var showsDeletionNotice: Binding<Bool> {
+        Binding(
+            get: { !deletionPreferences.skipNoticePermanently },
+            set: { deletionPreferences.skipNoticePermanently = !$0 }
+        )
     }
 
     private var privacySection: some View {
@@ -127,4 +156,5 @@ struct SettingsView: View {
 #Preview {
     SettingsView()
         .environmentObject(LocalizationManager())
+        .environmentObject(DeletionPreferences())
 }
