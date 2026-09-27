@@ -27,7 +27,7 @@ struct DeletionNoticeView: View {
                 VStack(spacing: 10) {
                     Image(systemName: "trash.circle.fill")
                         .font(.system(size: 40))
-                        .foregroundStyle(.brandDanger)
+                        .foregroundColor(Theme.brandDanger)
                         .padding(.top, 4)
 
                     Text(l10n.t("delete.notice.title"))
@@ -55,7 +55,7 @@ struct DeletionNoticeView: View {
                             .font(.body)
                             .frame(maxWidth: .infinity, minHeight: 48)
                     }
-                    .foregroundStyle(.brandPrimary)
+                    .foregroundColor(Theme.brandPrimary)
 
                     Divider().overlay(Color.white.opacity(0.15)).frame(height: 48)
 
@@ -66,7 +66,7 @@ struct DeletionNoticeView: View {
                             .font(.body.weight(.semibold))
                             .frame(maxWidth: .infinity, minHeight: 48)
                     }
-                    .foregroundStyle(.brandPrimary)
+                    .foregroundColor(Theme.brandPrimary)
                 }
             }
             .frame(maxWidth: 300)

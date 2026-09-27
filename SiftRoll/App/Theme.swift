@@ -22,6 +22,15 @@ extension Color {
     static let cardSurface = Color(white: 0.09)
 }
 
+/// Namespace for use in modifiers that infer `ShapeStyle` rather than `Color`
+/// (e.g. `.foregroundStyle(...)`, `.tint(...)`), where `.brandPrimary` alone does
+/// not resolve because the extension above lives on `Color`.
+enum Theme {
+    static let brandPrimary = Color.brandPrimary
+    static let brandSuccess = Color.brandSuccess
+    static let brandDanger = Color.brandDanger
+}
+
 enum Metrics {
     /// Corner radius of the photo card.
     static let cardCornerRadius: CGFloat = 28

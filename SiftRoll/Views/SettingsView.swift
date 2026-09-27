@@ -78,10 +78,10 @@ struct SettingsView: View {
                     Text(l10n.t("settings.deletion.showNotice"))
                 } icon: {
                     Image(systemName: "exclamationmark.bubble.fill")
-                        .foregroundStyle(.brandDanger)
+                        .foregroundColor(Theme.brandDanger)
                 }
             }
-            .tint(.brandPrimary)
+            .tint(Theme.brandPrimary)
         } header: {
             Text(l10n.t("settings.deletion.section"))
         } footer: {
@@ -105,7 +105,7 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             } icon: {
                 Image(systemName: "lock.shield.fill")
-                    .foregroundStyle(.brandPrimary)
+                    .foregroundColor(Theme.brandPrimary)
             }
 
             Button {

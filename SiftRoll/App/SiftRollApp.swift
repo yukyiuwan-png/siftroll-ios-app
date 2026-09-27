@@ -29,7 +29,7 @@ struct SiftRollApp: App {
                 // not only the device language.
                 .environment(\.locale, localization.language.locale)
                 .preferredColorScheme(.dark)
-                .tint(.brandPrimary)
+                .tint(Theme.brandPrimary)
         }
     }
 }
