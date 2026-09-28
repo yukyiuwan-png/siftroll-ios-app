@@ -54,6 +54,20 @@ Or in Finder: open the repo folder and **double-click `Open SiftRoll in Xcode.co
 
 **If you see** `The file …/SiftRoll/SiftRoll.xcodeproj does not exist`: you are in a **subfolder**, not the repo root. Run `pwd` and `ls`; go up with `cd ..` until `ls` shows `SiftRoll.xcodeproj` next to `SiftRoll/`.
 
+### Fix “Invalid redeclaration” / “ambiguous for type lookup”
+
+These errors mean Xcode is **compiling the same Swift file twice** (common after a nested clone or an old synchronized-folder project).
+
+```bash
+cd ~/siftroll
+git pull origin main
+git checkout origin/main -- SiftRoll.xcodeproj   # reset project file to match remote
+bash Scripts/verify-xcode-project.sh           # should print: ok: 21 Swift files…
+find . -name 'AssetThumbnailView.swift'        # should list ONLY ONE path
+```
+
+In Xcode: target **SiftRoll → Build Phases → Compile Sources** — each `.swift` should appear **once**. Remove any duplicate rows or a second **SiftRoll** folder reference. Then **Product → Clean Build Folder** (⇧⌘K) and build again.
+
 1. Open the project in **Xcode 16+** (synchronized `SiftRoll/` folder; shared scheme **SiftRoll**).
 2. Select the `SiftRoll` target → *Signing & Capabilities* → pick your team
    (`DEVELOPMENT_TEAM` is intentionally left blank).
