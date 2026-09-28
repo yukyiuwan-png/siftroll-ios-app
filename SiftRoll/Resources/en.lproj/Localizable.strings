@@ -47,6 +47,18 @@
 "deck.empty.title" = "No Photos Yet";
 "deck.empty.message" = "Your photo library is empty. Once you take some photos, come back to sift through them here.";
 
+"deck.finished.album.title" = "Album sifted!";
+"deck.finished.album.message" = "You’ve reviewed every photo in this album. Pick another year or month to keep going.";
+"deck.finished.chooseAlbum" = "Choose Another Album";
+
+/* Automatic albums (grouped by year / month) */
+"album.all" = "All Photos";
+"album.wholeYear" = "Whole Year";
+"album.photoCount" = "%@ photos";
+"album.picker.title" = "Albums";
+"album.picker.subtitle" = "SiftRoll groups your library by year and month automatically. Pick one to sift just those photos; your place in each album is remembered.";
+"album.button.accessibility" = "Choose album";
+
 /* Swipe overlay stamps */
 "swipe.keep" = "Keep";
 "swipe.delete" = "Delete";
@@ -80,6 +92,7 @@
 "settings.howItWorks.keep" = "Swipe right to keep a photo";
 "settings.howItWorks.delete" = "Swipe left to queue for deletion, then tap Delete Now to remove the batch";
 "settings.howItWorks.zoom" = "Pinch to zoom, double-tap to reset";
+"settings.howItWorks.albums" = "Tap the album name above the card to switch year or month";
 "settings.deletion.section" = "Deletion";
 "settings.deletion.showNotice" = "Show notice before first delete";
 "settings.deletion.footer" = "When on, SiftRoll explains once per session that swiped photos are queued and moved to Recently Deleted for 30 days. Ticking “Remember my setting” in that notice turns this off.";

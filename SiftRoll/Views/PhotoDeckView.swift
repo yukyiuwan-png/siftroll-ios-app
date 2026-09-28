@@ -23,6 +23,7 @@ struct PhotoDeckView: View {
     @State private var cardOffset: CGSize = .zero
     @State private var isAnimatingOut = false
     @State private var showsSettings = false
+    @State private var showsAlbumPicker = false
 
     init(library: PhotoLibraryService) {
         _model = StateObject(wrappedValue: PhotoDeckViewModel(library: library))
@@ -37,16 +38,37 @@ struct PhotoDeckView: View {
                 case .loading:
                     loadingView
                 case .finished:
-                    DeckFinishedView(keptCount: model.keptCount,
-                                     deletedCount: model.deletedCount,
-                                     pendingCount: model.pendingCount,
-                                     isLibraryEmpty: model.totalCount == 0 && model.pendingCount == 0,
-                                     isDeleting: model.isDeleting,
-                                     onCommit: { Task { await commitPendingDeletions() } },
-                                     onRestart: { model.restart() })
+                    VStack(spacing: 0) {
+                        albumButton
+                            .padding(.top, 4)
+                        DeckFinishedView(keptCount: model.keptCount,
+                                         deletedCount: model.deletedCount,
+                                         pendingCount: model.pendingCount,
+                                         isLibraryEmpty: model.libraryCount == 0 && model.pendingCount == 0,
+                                         isAlbum: model.isViewingAlbum,
+                                         isDeleting: model.isDeleting,
+                                         onCommit: { Task { await commitPendingDeletions() } },
+                                         onChooseAlbum: { showsAlbumPicker = true },
+                                         onRestart: { model.restart() })
+                    }
                 case .browsing:
                     deck
                 }
+            }
+            .sheet(isPresented: $showsAlbumPicker) {
+                AlbumPickerView(yearAlbums: model.yearAlbums,
+                                libraryCount: model.libraryCount,
+                                selected: model.selectedAlbum,
+                                onSelect: { selection in
+                                    var transaction = Transaction()
+                                    transaction.disablesAnimations = true
+                                    withTransaction(transaction) {
+                                        model.selectAlbum(selection)
+                                        cardOffset = .zero
+                                    }
+                                })
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { brandTitle }
@@ -142,8 +164,41 @@ struct PhotoDeckView: View {
         }
     }
 
+    /// Current automatic album (year / month / all) – tap to switch.
+    private var albumButton: some View {
+        Button {
+            Haptics.impact(.light)
+            showsAlbumPicker = true
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: model.isViewingAlbum ? "calendar" : "photo.on.rectangle.angled")
+                    .font(.system(size: 12, weight: .semibold))
+                Text(model.selectedAlbum.title(locale: l10n.language.locale) ?? l10n.t("album.all"))
+                    .font(.subheadline.weight(.semibold))
+                Text("·")
+                    .foregroundStyle(.secondary)
+                Text(l10n.t("album.photoCount", formatted(model.totalCount)))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(.secondary)
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(Color.white.opacity(0.1), in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .disabled(model.isDeleting)
+        .accessibilityLabel(l10n.t("album.button.accessibility"))
+    }
+
     private var deck: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 12) {
+            albumButton
+
             GeometryReader { geo in
                 ZStack {
                     // Next card peeks from behind so the deck feels like a stack.
@@ -163,7 +218,7 @@ struct PhotoDeckView: View {
                         .disabled(isAnimatingOut || model.isDeleting)
                     }
                 }
-                .onChange(of: model.currentIndex, initial: true) { _, _ in
+                .onChange(of: PrefetchKey(index: model.currentIndex, album: model.selectedAlbum), initial: true) { _, _ in
                     let target = PhotoLibraryService.targetPixelSize(for: geo.size, displayScale: displayScale)
                     library.prefetch(model.upcomingAssets(), targetSize: target)
                 }
@@ -255,6 +310,12 @@ struct PhotoDeckView: View {
 
     private func formatted(_ value: Int) -> String {
         value.formatted(.number.locale(l10n.language.locale))
+    }
+
+    /// Re-prefetch when either the cursor moves or the album changes.
+    private struct PrefetchKey: Equatable {
+        let index: Int
+        let album: AlbumSelection
     }
 
     private func roundButton(icon: String, color: Color, labelKey: String, action: @escaping () -> Void) -> some View {

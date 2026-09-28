@@ -8,6 +8,10 @@ it to *Recently Deleted*. Photos are read straight from the system photo library
 through `PHPhotoLibrary` – nothing is imported, copied or uploaded.
 
 - **Pure SwiftUI + PhotoKit**, iOS 17+, no third-party dependencies.
+- **Automatic albums**: the library is grouped by year and month from each photo's
+  creation date (no albums are written to Photos). Tap the album pill above the card
+  to sift a single month, a whole year, or everything; your place in each album is
+  remembered, and counts update live as you swipe or as new photos arrive.
 - **Bilingual**: English and Traditional Chinese (Hong Kong terminology). The
   language is detected from the system on first launch and can be toggled from
   the `EN | 繁中` pill in the navigation bar or from Settings.

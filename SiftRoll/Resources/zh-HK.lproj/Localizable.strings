@@ -51,6 +51,18 @@
 "deck.empty.title" = "尚未有相片";
 "deck.empty.message" = "你的相片圖庫暫時是空的。拍攝一些相片後，再回來這裡篩揀吧。";
 
+"deck.finished.album.title" = "此相簿已篩揀完成！";
+"deck.finished.album.message" = "你已檢視此相簿的所有相片。選擇另一個年份或月份繼續。";
+"deck.finished.chooseAlbum" = "選擇其他相簿";
+
+/* Automatic albums (grouped by year / month) */
+"album.all" = "所有相片";
+"album.wholeYear" = "全年";
+"album.photoCount" = "%@ 張相片";
+"album.picker.title" = "相簿";
+"album.picker.subtitle" = "SiftRoll 會按年份及月份自動為你的圖庫分類。選擇其中一個，只篩揀該批相片；每個相簿的進度都會記住。";
+"album.button.accessibility" = "選擇相簿";
+
 /* Swipe overlay stamps */
 "swipe.keep" = "保留";
 "swipe.delete" = "刪除";
@@ -84,6 +96,7 @@
 "settings.howItWorks.keep" = "向右掃保留相片";
 "settings.howItWorks.delete" = "向左掃加入待刪除列表，再點一下「立即刪除」整批移除";
 "settings.howItWorks.zoom" = "兩指縮放，點兩下還原";
+"settings.howItWorks.albums" = "點一下卡片上方的相簿名稱，即可切換年份或月份";
 "settings.deletion.section" = "刪除";
 "settings.deletion.showNotice" = "首次刪除前顯示提示";
 "settings.deletion.footer" = "開啟後，SiftRoll 每次使用時只會提示一次：掃走的相片會加入待刪除列表，並移至「最近刪除」保留 30 日。在提示中剔選「記住我的設定」即會關閉此選項。";

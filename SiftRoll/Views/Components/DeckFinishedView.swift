@@ -16,8 +16,11 @@ struct DeckFinishedView: View {
     let pendingCount: Int
     /// True when the library had no photos at all (as opposed to "you finished").
     let isLibraryEmpty: Bool
+    /// True when only a year/month album was finished, not the whole library.
+    let isAlbum: Bool
     let isDeleting: Bool
     let onCommit: () -> Void
+    let onChooseAlbum: () -> Void
     let onRestart: () -> Void
 
     var body: some View {
@@ -33,10 +36,10 @@ struct DeckFinishedView: View {
                 .shadow(color: Color.brandPrimary.opacity(0.4), radius: 24)
 
             VStack(spacing: 10) {
-                Text(l10n.t(isLibraryEmpty ? "deck.empty.title" : "deck.finished.title"))
+                Text(l10n.t(titleKey))
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
-                Text(l10n.t(isLibraryEmpty ? "deck.empty.message" : "deck.finished.message"))
+                Text(l10n.t(messageKey))
                     .font(.body)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -82,12 +85,25 @@ struct DeckFinishedView: View {
                     .disabled(isDeleting)
                 }
 
+                if !isLibraryEmpty {
+                    Button(action: onChooseAlbum) {
+                        Label(l10n.t("deck.finished.chooseAlbum"), systemImage: "calendar")
+                            .fontWeight(.semibold)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(pendingCount > 0 ? Color.white.opacity(0.1) : Color.brandPrimary,
+                                        in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                            .foregroundStyle(.white)
+                    }
+                    .disabled(isDeleting)
+                }
+
                 Button(action: onRestart) {
                     Label(l10n.t("deck.finished.restart"), systemImage: "arrow.counterclockwise")
                         .fontWeight(.semibold)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
-                        .background(pendingCount > 0 ? Color.white.opacity(0.1) : Color.brandPrimary,
+                        .background(isLibraryEmpty ? Color.brandPrimary : Color.white.opacity(0.1),
                                     in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                         .foregroundStyle(.white)
                 }
@@ -96,6 +112,16 @@ struct DeckFinishedView: View {
             .padding(.horizontal, 28)
             .padding(.bottom, 12)
         }
+    }
+
+    private var titleKey: String {
+        if isLibraryEmpty { return "deck.empty.title" }
+        return isAlbum ? "deck.finished.album.title" : "deck.finished.title"
+    }
+
+    private var messageKey: String {
+        if isLibraryEmpty { return "deck.empty.message" }
+        return isAlbum ? "deck.finished.album.message" : "deck.finished.message"
     }
 
     private func formatted(_ value: Int) -> String {
@@ -123,7 +149,8 @@ struct DeckFinishedView: View {
 
 #Preview {
     DeckFinishedView(keptCount: 42, deletedCount: 17, pendingCount: 5,
-                     isLibraryEmpty: false, isDeleting: false, onCommit: {}) {}
+                     isLibraryEmpty: false, isAlbum: true, isDeleting: false,
+                     onCommit: {}, onChooseAlbum: {}) {}
         .environmentObject(LocalizationManager())
         .background(Color.black)
         .preferredColorScheme(.dark)

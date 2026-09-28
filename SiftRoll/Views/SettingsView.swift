@@ -67,6 +67,7 @@ struct SettingsView: View {
             gestureRow(icon: "arrow.right.circle.fill", color: .brandSuccess, key: "settings.howItWorks.keep")
             gestureRow(icon: "arrow.left.circle.fill", color: .brandDanger, key: "settings.howItWorks.delete")
             gestureRow(icon: "arrow.up.left.and.arrow.down.right.circle.fill", color: .brandPrimary, key: "settings.howItWorks.zoom")
+            gestureRow(icon: "calendar.circle.fill", color: .brandPrimary, key: "settings.howItWorks.albums")
         }
     }
 
