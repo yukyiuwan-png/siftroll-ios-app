@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5A1F0C092C9E4B0000A1B2C3"
+               BlueprintIdentifier = "5506719B82214519AEC55FDA"
                BuildableName = "SiftRoll.app"
                BlueprintName = "SiftRoll"
                ReferencedContainer = "container:SiftRoll.xcodeproj">
@@ -43,7 +43,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5A1F0C092C9E4B0000A1B2C3"
+            BlueprintIdentifier = "5506719B82214519AEC55FDA"
             BuildableName = "SiftRoll.app"
             BlueprintName = "SiftRoll"
             ReferencedContainer = "container:SiftRoll.xcodeproj">
@@ -60,7 +60,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5A1F0C092C9E4B0000A1B2C3"
+            BlueprintIdentifier = "5506719B82214519AEC55FDA"
             BuildableName = "SiftRoll.app"
             BlueprintName = "SiftRoll"
             ReferencedContainer = "container:SiftRoll.xcodeproj">

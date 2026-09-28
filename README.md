@@ -102,7 +102,8 @@ SiftRoll/
     en.lproj/                  Localizable.strings, InfoPlist.strings
     zh-HK.lproj/               Localizable.strings, InfoPlist.strings (香港繁體中文)
   Assets.xcassets/             App icon, in-app logo, brand colors
-  Info.plist                   NSPhotoLibraryUsageDescription and related keys
+SupportingFiles/
+  Info.plist                   NSPhotoLibraryUsageDescription (not copied into the app bundle; merged at build time)
 Design/
   app-icon-1024.png            App Store icon (1024×1024, no alpha)
   mockups/                     iPhone-frame UI mockups for each screen
