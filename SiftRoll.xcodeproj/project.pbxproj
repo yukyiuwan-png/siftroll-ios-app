@@ -6,8 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		5A1F0C162C9E4B0000A1B2C3 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A1F0C152C9E4B0000A1B2C3 /* Photos.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		5A1F0C0A2C9E4B0000A1B2C3 /* SiftRoll.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SiftRoll.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A1F0C152C9E4B0000A1B2C3 /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -36,6 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A1F0C162C9E4B0000A1B2C3 /* Photos.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,6 +52,7 @@
 			isa = PBXGroup;
 			children = (
 				5A1F0C0C2C9E4B0000A1B2C3 /* SiftRoll */,
+				5A1F0C172C9E4B0000A1B2C3 /* Frameworks */,
 				5A1F0C0D2C9E4B0000A1B2C3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -56,6 +63,14 @@
 				5A1F0C0A2C9E4B0000A1B2C3 /* SiftRoll.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		5A1F0C172C9E4B0000A1B2C3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5A1F0C152C9E4B0000A1B2C3 /* Photos.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -272,6 +287,7 @@
 				INFOPLIST_FILE = SiftRoll/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SiftRoll;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "SiftRoll needs full access to your photo library so you can browse your photos as swipe cards and move the ones you no longer want to Recently Deleted. Photos are never copied or uploaded.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -305,6 +321,7 @@
 				INFOPLIST_FILE = SiftRoll/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SiftRoll;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "SiftRoll needs full access to your photo library so you can browse your photos as swipe cards and move the ones you no longer want to Recently Deleted. Photos are never copied or uploaded.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

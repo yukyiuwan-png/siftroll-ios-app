@@ -29,7 +29,7 @@ through `PHPhotoLibrary` – nothing is imported, copied or uploaded.
 
 ## Run it
 
-1. Open `SiftRoll.xcodeproj` in Xcode.
+1. Open **`SiftRoll.xcodeproj`** at the repo root in Xcode 16+ (uses a synchronized `SiftRoll/` folder so new Swift files are picked up automatically; shared scheme: **SiftRoll**).
 2. Select the `SiftRoll` target → *Signing & Capabilities* → pick your team
    (`DEVELOPMENT_TEAM` is intentionally left blank).
 3. Choose a device or simulator and press **Run**.
