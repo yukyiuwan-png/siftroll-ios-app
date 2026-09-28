@@ -52,20 +52,24 @@ SiftRoll/
   Localization/
     AppLanguage.swift          Supported languages + system language detection
     LocalizationManager.swift  Runtime language switching, `t("key")` lookup, bilingual helper
+  Models/
+    PhotoAlbum.swift           DateKey, AlbumSelection (all / year / month), YearAlbum, MonthAlbum
   Services/
     PhotoLibraryService.swift  PHPhotoLibrary authorization, fetching, image loading, deletion
     DeletionPreferences.swift  Once-per-session flag + persisted "Remember my setting"
   ViewModels/
-    PhotoDeckViewModel.swift   Deck state, pending-deletion queue + batch commit, library-change reconciliation
+    PhotoDeckViewModel.swift   Deck state, year/month albums, pending-deletion queue + batch commit, library-change reconciliation
   Views/
     RootView.swift             Routes between permission screen and the deck
     PermissionView.swift       Onboarding / permission request / "full access required" alert
     PhotoDeckView.swift        Main swipe screen, one-time deletion notice, pending bar, error alerts
     SettingsView.swift         Language switch, how-it-works, privacy, about
+    AlbumPickerView.swift      Sheet listing All Photos → years → months with counts and covers
     Components/
       SwipeCardView.swift      Drag (spring back / fly away) + pinch-to-zoom + double-tap reset
       SwipeOverlayView.swift   Green "Keep / 保留" and red "Delete / 刪除" stamps
       DeletionNoticeView.swift Custom alert-style notice with the remember checkbox
+      AssetThumbnailView.swift Small on-demand thumbnail used for album covers
       PhotoCardView.swift      On-demand image loading with loading / error / retry states
       DeckFinishedView.swift   "All sifted" and empty-library states
       LanguageToggleButton.swift
@@ -93,6 +97,7 @@ Design/
 | Pinch | Zooms the photo (up to 4×); dragging pans while zoomed |
 | Double-tap | Resets zoom |
 | Round ✕ / ✓ buttons | Same flows as swiping, for one-handed or accessibility use |
+| Album pill above the card | Opens the album picker (All Photos, each year, each month); the deck reloads for that album and resumes where you left it |
 
 Error handling: photos that fail to load (e.g. iCloud originals that haven't
 downloaded) show an inline error with **Retry** and **Skip**; failed deletions
