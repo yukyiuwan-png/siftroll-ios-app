@@ -29,7 +29,32 @@ through `PHPhotoLibrary` – nothing is imported, copied or uploaded.
 
 ## Run it
 
-1. Open **`SiftRoll.xcodeproj`** at the repo root in Xcode 16+ (uses a synchronized `SiftRoll/` folder so new Swift files are picked up automatically; shared scheme: **SiftRoll**).
+### Open the Xcode project (important: repo **root**)
+
+After clone, the layout must look like this — **`SiftRoll.xcodeproj` and the `SiftRoll/` source folder are siblings**:
+
+```
+siftroll/                    ← repository root (cd here)
+├── SiftRoll.xcodeproj       ← open THIS (not inside SiftRoll/)
+├── SiftRoll/                ← Swift source (App, Views, …)
+├── Open SiftRoll in Xcode.command
+└── README.md
+```
+
+From Terminal:
+
+```bash
+cd ~/siftroll          # or wherever you cloned yuk-yiu-wan/siftroll
+git pull origin main
+ls                     # you must see: SiftRoll.xcodeproj  and  SiftRoll
+open SiftRoll.xcodeproj
+```
+
+Or in Finder: open the repo folder and **double-click `Open SiftRoll in Xcode.command`** (or double-click `SiftRoll.xcodeproj`).
+
+**If you see** `The file …/SiftRoll/SiftRoll.xcodeproj does not exist`: you are in a **subfolder**, not the repo root. Run `pwd` and `ls`; go up with `cd ..` until `ls` shows `SiftRoll.xcodeproj` next to `SiftRoll/`.
+
+1. Open the project in **Xcode 16+** (synchronized `SiftRoll/` folder; shared scheme **SiftRoll**).
 2. Select the `SiftRoll` target → *Signing & Capabilities* → pick your team
    (`DEVELOPMENT_TEAM` is intentionally left blank).
 3. Choose a device or simulator and press **Run**.
