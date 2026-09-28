@@ -46,6 +46,8 @@ final class PhotoLibraryService: NSObject, ObservableObject {
     /// Fires whenever the system library changes (deletions, new photos, iCloud sync).
     let libraryDidChange = PassthroughSubject<PHChange, Never>()
 
+    /// Image requests run on a dedicated actor so PhotoKit callbacks never force a
+    /// synchronous hop on the main actor (the source of `unsafeForcedSync` warnings).
     private let imageLoader = PhotoImageLoader()
 
     override init() {
@@ -103,12 +105,13 @@ final class PhotoLibraryService: NSObject, ObservableObject {
         return CGSize(width: width, height: height)
     }
 
-    /// Warm the cache for upcoming cards so the next swipe feels instant.
+    /// Warm the cache for upcoming cards so the next swipe feels instant (non-blocking).
     func prefetch(_ assets: [PHAsset], targetSize: CGSize) {
-        imageLoader.prefetch(assets, targetSize: targetSize)
+        Task { await imageLoader.prefetch(assets, targetSize: targetSize) }
     }
 
-    /// Loads a preview image for `asset`, honoring Swift task cancellation.
+    /// Loads a preview image for `asset`. Suspends the caller without blocking its
+    /// executor; work runs on `PhotoImageLoader`'s actor.
     func loadImage(for asset: PHAsset, targetSize: CGSize) async throws -> UIImage {
         try await imageLoader.loadImage(for: asset, targetSize: targetSize)
     }
@@ -151,21 +154,9 @@ extension PhotoLibraryService: PHPhotoLibraryChangeObserver {
 
 // MARK: - Image loader
 
-/// Wraps `PHCachingImageManager`. Deliberately *not* main-actor isolated: PhotoKit
-/// invokes result handlers on a background queue, and this keeps the async bridge
-/// free of any actor assumptions.
-final class PhotoImageLoader: @unchecked Sendable {
+/// Owns the caching manager and performs all PhotoKit image work off the main actor.
+actor PhotoImageLoader {
     private let manager = PHCachingImageManager()
-
-    private static func requestOptions() -> PHImageRequestOptions {
-        let options = PHImageRequestOptions()
-        // Single high-quality delivery keeps the async API simple (handler fires once).
-        options.deliveryMode = .highQualityFormat
-        options.resizeMode = .fast
-        options.isNetworkAccessAllowed = true   // allow iCloud download when needed
-        options.isSynchronous = false
-        return options
-    }
 
     func prefetch(_ assets: [PHAsset], targetSize: CGSize) {
         manager.stopCachingImagesForAllAssets()
@@ -177,67 +168,18 @@ final class PhotoImageLoader: @unchecked Sendable {
     }
 
     func loadImage(for asset: PHAsset, targetSize: CGSize) async throws -> UIImage {
-        let manager = self.manager
-        let token = ImageRequestToken()
-
-        return try await withTaskCancellationHandler {
-            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<UIImage, Error>) in
-                let requestID = manager.requestImage(for: asset,
-                                                     targetSize: targetSize,
-                                                     contentMode: .aspectFit,
-                                                     options: Self.requestOptions()) { image, info in
-                    // Guard against any double invocation from PhotoKit.
-                    guard token.claimResume() else { return }
-
-                    if let image {
-                        continuation.resume(returning: image)
-                    } else if (info?[PHImageCancelledKey] as? Bool) == true {
-                        continuation.resume(throwing: PhotoLibraryError.cancelled)
-                    } else if let error = info?[PHImageErrorKey] as? Error {
-                        continuation.resume(throwing: PhotoLibraryError.underlying(error))
-                    } else if (info?[PHImageResultIsInCloudKey] as? Bool) == true {
-                        continuation.resume(throwing: PhotoLibraryError.assetInCloud)
-                    } else {
-                        continuation.resume(throwing: PhotoLibraryError.imageUnavailable)
-                    }
-                }
-                token.register(requestID, manager: manager)
-            }
-        } onCancel: {
-            token.cancel(manager: manager)
-        }
-    }
-}
-
-/// Thread-safe bookkeeping for a single `PHImageManager` request so it can be
-/// cancelled from Swift concurrency and never resumes its continuation twice.
-private final class ImageRequestToken: @unchecked Sendable {
-    private let lock = NSLock()
-    private var requestID: PHImageRequestID?
-    private var isCancelled = false
-    private var isResumed = false
-
-    func register(_ id: PHImageRequestID, manager: PHImageManager) {
-        lock.lock()
-        requestID = id
-        let cancelNow = isCancelled
-        lock.unlock()
-        if cancelNow { manager.cancelImageRequest(id) }
+        try await manager.requestImageAsync(for: asset,
+                                            targetSize: targetSize,
+                                            contentMode: .aspectFit,
+                                            options: Self.requestOptions())
     }
 
-    func cancel(manager: PHImageManager) {
-        lock.lock()
-        isCancelled = true
-        let id = requestID
-        lock.unlock()
-        if let id { manager.cancelImageRequest(id) }
-    }
-
-    func claimResume() -> Bool {
-        lock.lock()
-        defer { lock.unlock() }
-        if isResumed { return false }
-        isResumed = true
-        return true
+    private static func requestOptions() -> PHImageRequestOptions {
+        let options = PHImageRequestOptions()
+        options.deliveryMode = .highQualityFormat
+        options.resizeMode = .fast
+        options.isNetworkAccessAllowed = true
+        options.isSynchronous = false
+        return options
     }
 }
