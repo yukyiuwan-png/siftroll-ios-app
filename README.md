@@ -22,6 +22,55 @@ through `PHPhotoLibrary` – nothing is imported, copied or uploaded.
   confirmation for the whole batch. Deleted photos land in the iOS
   *Recently Deleted* album (30-day recovery), exactly like Apple Photos.
 
+## Repository (GitHub as primary)
+
+Use **GitHub** as the source of truth for clones, CI, and day-to-day pushes.
+Cursor’s Origin remote (`yuk-yiu-wan/siftroll` on [cursor.com/codebase](https://cursor.com/codebase/yuk-yiu-wan/siftroll))
+can stay as a mirror after you sync from GitHub.
+
+### One-time setup
+
+1. **Connect GitHub in Cursor**  
+   [Cursor Dashboard → Integrations](https://cursor.com/dashboard?tab=integrations) → connect your GitHub account.
+
+2. **Create an empty GitHub repo** (e.g. `https://github.com/<your-user>/siftroll`) — no README if you are pushing an existing tree.
+
+3. **Push `main` from your Mac** (or any machine that already has this project):
+
+   ```bash
+   cd ~/siftroll
+   git remote add github https://github.com/<your-user>/siftroll.git   # skip if already added
+   git push -u github main
+   git push github --tags   # optional
+   ```
+
+4. **Point Cursor Codebase at GitHub**  
+   [cursor.com/codebase](https://cursor.com/codebase) → **Sync from GitHub** → choose `siftroll`.  
+   After this, treat GitHub as canonical; pull agents’ work from GitHub when you work locally.
+
+### Daily workflow (GitHub primary)
+
+```bash
+git pull github main
+# … edit in Xcode …
+git add -A && git commit -m "Describe your change"
+git push github main
+```
+
+If you still have a Cursor **origin** remote and want both updated:
+
+```bash
+git push github main && git push origin main
+```
+
+**Clone (GitHub):**
+
+```bash
+git clone https://github.com/<your-user>/siftroll.git
+cd siftroll
+open SiftRoll.xcodeproj
+```
+
 ## Requirements
 
 - Xcode 16 or later (the project uses Xcode 16 folder-synchronized groups).
@@ -44,8 +93,8 @@ siftroll/                    ← repository root (cd here)
 From Terminal:
 
 ```bash
-cd ~/siftroll          # or wherever you cloned yuk-yiu-wan/siftroll
-git pull origin main
+cd ~/siftroll          # repo root after clone (GitHub or Cursor mirror)
+git pull github main   # or: git pull origin main if you only use Cursor remote
 ls                     # you must see: SiftRoll.xcodeproj  and  SiftRoll
 open SiftRoll.xcodeproj
 ```
@@ -60,8 +109,8 @@ These errors mean Xcode is **compiling the same Swift file twice** (common after
 
 ```bash
 cd ~/siftroll
-git pull origin main
-git checkout origin/main -- SiftRoll.xcodeproj   # reset project file to match remote
+git pull github main   # or origin main
+git checkout github/main -- SiftRoll.xcodeproj   # reset project file (use origin/main if needed)
 bash Scripts/verify-xcode-project.sh           # should print: ok: 21 Swift files…
 find . -name 'AssetThumbnailView.swift'        # should list ONLY ONE path
 ```
