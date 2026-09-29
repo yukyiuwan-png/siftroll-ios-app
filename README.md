@@ -33,16 +33,24 @@ can stay as a mirror after you sync from GitHub.
 1. **Connect GitHub in Cursor**  
    [Cursor Dashboard → Integrations](https://cursor.com/dashboard?tab=integrations) → connect your GitHub account.
 
-2. **Create an empty GitHub repo** (e.g. `https://github.com/<your-user>/siftroll`) — no README if you are pushing an existing tree.
+2. **GitHub repo:** [yukyiuwan-png/siftroll-ios-app](https://github.com/yukyiuwan-png/siftroll-ios-app) (public `main`).
 
-3. **Push `main` from your Mac** (or any machine that already has this project):
+3. **Push the latest `main` from your Mac** (Cloud Agents push to Cursor Origin only; GitHub needs your credentials):
 
    ```bash
    cd ~/siftroll
-   git remote add github https://github.com/<your-user>/siftroll.git   # skip if already added
-   git push -u github main
-   git push github --tags   # optional
+   bash Scripts/push-to-github.sh
    ```
+
+   Or manually:
+
+   ```bash
+   git remote add github https://github.com/yukyiuwan-png/siftroll-ios-app.git   # once
+   git pull origin main
+   git push -u github main
+   ```
+
+   If you committed in Xcode first, run `git push origin main` before `git push github main` so both remotes match.
 
 4. **Point Cursor Codebase at GitHub**  
    [cursor.com/codebase](https://cursor.com/codebase) → **Sync from GitHub** → choose `siftroll`.  
@@ -66,8 +74,8 @@ git push github main && git push origin main
 **Clone (GitHub):**
 
 ```bash
-git clone https://github.com/<your-user>/siftroll.git
-cd siftroll
+git clone https://github.com/yukyiuwan-png/siftroll-ios-app.git
+cd siftroll-ios-app
 open SiftRoll.xcodeproj
 ```
 
