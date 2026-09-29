@@ -52,6 +52,19 @@ can stay as a mirror after you sync from GitHub.
 
    If you committed in Xcode first, run `git push origin main` before `git push github main` so both remotes match.
 
+   **Script path:** `Scripts/push-to-github.sh` (folder name is **`Scripts`**, not `Script`).
+
+   **If `git pull origin main` aborts** because Xcode changed `project.pbxproj` or left an untracked `project.xcworkspace/contents.xcworkspacedata`, stash everything, pull, then push:
+
+   ```bash
+   cd ~/siftroll
+   git stash push -u -m "Mac Xcode before origin sync"
+   git pull origin main
+   bash Scripts/push-to-github.sh
+   ```
+
+   Your stashed copy stays in `git stash list` if you need to compare. Prefer the remote `project.pbxproj` on `main` (duplicate Compile Sources fix); only `git stash pop` if you know you need a local-only change.
+
 4. **Point Cursor Codebase at GitHub**  
    [cursor.com/codebase](https://cursor.com/codebase) → **Sync from GitHub** → choose `siftroll`.  
    After this, treat GitHub as canonical; pull agents’ work from GitHub when you work locally.
