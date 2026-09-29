@@ -124,6 +124,19 @@ Or in Finder: open the repo folder and **double-click `Open SiftRoll in Xcode.co
 
 **If you see** `The file …/SiftRoll/SiftRoll.xcodeproj does not exist`: you are in a **subfolder**, not the repo root. Run `pwd` and `ls`; go up with `cd ..` until `ls` shows `SiftRoll.xcodeproj` next to `SiftRoll/`.
 
+### Fix `modified: SiftRoll/siftroll (modified content)` / empty commit
+
+That means a **second git repo** was cloned *inside* the project (e.g. `SiftRoll/siftroll` or `siftroll-1`). The outer repo cannot commit those files; they also cause duplicate Swift compile errors.
+
+```bash
+cd ~/siftroll
+git pull github main
+rm -rf SiftRoll/siftroll siftroll-1    # delete nested clones (safe if you work at repo root)
+git status                             # should be clean, or only real source changes
+```
+
+Never run `git clone … siftroll` into `SiftRoll/` — keep one repo root with `SiftRoll.xcodeproj` beside the `SiftRoll/` source folder.
+
 ### Fix “Invalid redeclaration” / “ambiguous for type lookup”
 
 These errors mean Xcode is **compiling the same Swift file twice** (common after a nested clone or an old synchronized-folder project).
